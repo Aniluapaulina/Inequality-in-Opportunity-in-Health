@@ -19,18 +19,21 @@ tab n_waves
 
 *** Unconditional Distribution of Health outcomes 
 tempfile results
-postfile handle int year str3 var double mean sd using `results', replace
+postfile handle int year str3 var double mean sd N using `results', replace
 
 forvalues yr = 2002(2)2022 {
     foreach var in mcs pcs pcs_cfa50 mcs_cfa50 {
 
         quietly summarize `var' [fw=w] if syear == `yr'
+		/* quietly summarize `var' if syear == `yr' */
 
         post handle ///
             (`yr') ///
             ("`var'") ///
             (r(mean)) ///
-            (r(sd))
+            (r(sd)) ///
+			(r(N)/1000000) // Angaben in Mio
+			/* (r(N)) */
     }
 }
 
@@ -41,7 +44,8 @@ postclose handle
 	restore 
 
 	
-*** Unconditional Distribution of Circumstances 
+*** Unconditional Distribution of Circumstances
+
 forvalues yr = 2002(2)2022 {
     foreach var in migback birthregion birthregion_ew siblings age ///
                    migback_binary fsedu fprofstat singleparent ///
@@ -49,25 +53,32 @@ forvalues yr = 2002(2)2022 {
 
         preserve
         keep if syear == `yr'
-		
-        collapse (sum) w, by(`var')
-  
-        egen totalw = total(w)
-        gen share = w / totalw
 
+        * Summe pro Kategorie
+        collapse (sum) w, by(`var')
+
+        * Gesamtsumme der Gewichte im Jahr
+        egen total_w = total(w)
+
+        * Populationsanteil
+        gen share = w / total_w
+
+        * Graph
         graph bar share, over(`var') ///
-            ytitle("Share of population") ///
-            ylabel(0(.1)1, format(%3.1f)) ///
-            title("`var' – `yr'")
+            ytitle("Population share") ///
+            title("`var' – `yr'") ///
+            blabel(bar, format(%4.2f))
 
         graph export "$output\Graphs\graph_`var'_`yr'.png", replace
+
         restore
     }
 }
+
 	/*
 	- age: (bysort syear: su age) Durchschnittsalter sinkt von 70 Jahren in 2002 auf 50 Jahre in 2022
 	- migback: Anteil non-migback sinkt (nachvollziehbarer Weise) von 85% in 2002 auf 75% in 2022
-	- fprofstat und fsedu: missings (13) nehmen in 2022 rapide zu - 
+	- fprofstat und fsedu: 
 	- otherparent: Anteil otherparent steigt von 6% in 2002 auf % in 2022 
 	- singleparent: 
 	
