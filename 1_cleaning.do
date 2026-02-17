@@ -493,6 +493,27 @@ use $output/pre_ci.dta , clear
 
 	drop if missing(siblings, msedu, fsedu, mprofstat, fprofstat, otherparent)
 	
+	di _N
+	tab syear // zwischen 16,000 und 23,000 Beobachtungen in Jahren 2002-2022(2)
+	
+	/*
+			  syear |      Freq.     Percent        Cum.
+		------------+-----------------------------------
+			   2002 |     19,622        8.24        8.24
+			   2004 |     19,755        8.30       16.54
+			   2006 |     19,716        8.28       24.83
+			   2008 |     17,898        7.52       32.34
+			   2010 |     17,046        7.16       39.51
+			   2012 |     18,705        7.86       47.36
+			   2014 |     24,500       10.29       57.66
+			   2016 |     24,364       10.24       67.89
+			   2018 |     26,251       11.03       78.92
+			   2020 |     26,614       11.18       90.10
+			   2022 |     23,564        9.90      100.00
+		------------+-----------------------------------
+			  Total |    238,035      100.00
+	*/
+	
 	drop if msedu == 100
 	drop if fsedu == 100
 	drop if mprofstat == 100
@@ -501,7 +522,7 @@ use $output/pre_ci.dta , clear
 	drop if singleparent == 3
 	
 	di _N
-	tab syear // zwischen 16,000 und 23,000 Beobachtungen in Jahren 2002-2022(2)
+	tab syear
 	/*
 			  syear |      Freq.     Percent        Cum.
 		------------+-----------------------------------
@@ -519,6 +540,7 @@ use $output/pre_ci.dta , clear
 		------------+-----------------------------------
 		  Total |    135,644      100.00
 
+	- loss of obersations in 2022 largely driven by the variables *sedu und *profstat 
  */
 
 	save $output/base.dta , replace
