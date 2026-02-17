@@ -277,18 +277,20 @@ use $output/pre_ci.dta , clear
 		replace fedu6 = 4 if inlist(fsedu, 4,7,9)
 		replace fedu6 = 5 if inlist(fsedu, 5)  
 		replace fedu6 = 6 if inlist(fsedu, 6) 
-		replace fedu6 = 7 if inlist(fsedu, -1, .) 
+		replace fedu6 = 7 if inlist(fsedu, -1) 
+		replace fedu6 = 100 if inlist(fsedu, ., -5) 
 
 	gen medu6 = .
 		replace medu6 = 1 if inlist(msedu, 1, -2 )
 		replace medu6 = 2 if inlist(msedu, 2)
 		replace medu6 = 3 if inlist(msedu, 3,8)
 		replace medu6 = 4 if inlist(msedu, 4,7,9)
-		replace medu6 = 5 if inlist(fsedu, 5)  
-		replace medu6 = 6 if inlist(fsedu, 6) 
-		replace medu6 = 7 if inlist(fsedu, -1, .) 
+		replace medu6 = 5 if inlist(msedu, 5)  
+		replace medu6 = 6 if inlist(msedu, 6) 
+		replace medu6 = 7 if inlist(msedu, -1 ) 
+		replace medu6 = 100 if inlist(msedu, ., -5)
 		
-		label define edu6_lbl 1 "No degree" 2 "Secondary" 3 "Intermediate" 4 "Upper secondary" 5 "Other degree" 6 "No idea" 7 "Keine Angabe"
+		label define edu6_lbl 1 "No degree" 2 "Secondary" 3 "Intermediate" 4 "Upper secondary" 5 "Other degree" 6 "No idea" 7 "Keine Angabe" 100 "Missing"
 		label values fedu6 edu6_lbl
 		label values medu6 edu6_lbl
 		label var fedu6 "Father's school education"
@@ -309,7 +311,7 @@ use $output/pre_ci.dta , clear
 			replace fprof7 = 5 if inlist(fprofstat, 10, 11, 12, 13, 15, 110, 120, 130, 140 )
 			replace fprof7 = 6 if inlist(fprofstat, 0)
 			replace fprof7 = 7 if inlist(fprofstat, 1)
-			replace fprof7 = 100 if inlist(fprofstat, .)
+			replace fprof7 = 100 if inlist(fprofstat, -1, .)
 		
 		gen mprof7 = .
 			replace mprof7 = 1 if inlist(mprofstat, 200, 210, 220, 230, 240, 250, 310, 320, 330, 510 )
@@ -317,11 +319,12 @@ use $output/pre_ci.dta , clear
 			replace mprof7 = 3 if inlist(mprofstat, 340, 500 , 520, 521,522, 530, 540, 550, 560 )
 			replace mprof7 = 4 if inlist(mprofstat, 600, 610, 620, 630, 640 )
 			replace mprof7 = 5 if inlist(mprofstat, 10, 11, 12, 13, 15, 110, 120, 130, 140 )
-			replace mprof7 = 6 if inlist(fprofstat, 0)
-			replace mprof7 = 7 if inlist(fprofstat, 1)
-			replace mprof7 = 100 if inlist(fprofstat, .)
+			replace mprof7 = 6 if inlist(mprofstat, 0)
+			replace mprof7 = 7 if inlist(mprofstat, 1)
+			replace mprof7 = 100 if inlist(mprofstat, -1, .)
 			
-		label define prof7_lbl 1 "blue collar" 2 "selfemployed" 3 "white collar" 4 "civil servant" 5 "not working or in training" 100 "Keine Angabe"
+		label define prof7_lbl 1 "blue collar" 2 "selfemployed" 3 "white collar" 4 "civil servant" 5 "not working or in training" 6 "no idea" /// 
+		7 "lebte nicht mehr" 100 "missing"
 		label values fprof7 prof7_lbl
 		label values mprof7 prof7_lbl
 		label var fprof7 "Father's occupation at age 15 "
@@ -361,7 +364,7 @@ use $output/pre_ci.dta , clear
 			replace fprof12 = 12 if inlist(fprofstat, 422, 423, 424, 432, 433, 434 ) //
 				// Selbständige und Freiberufler mit Mitarbeitern 
 				
-			replace fprof12 = 13 if inlist(mprofstat, -1, .) 
+			replace fprof12 = 13 if inlist(fprofstat, -1, .) 
 				// Missing 
 				
 		gen mprof12 = . 
@@ -377,14 +380,13 @@ use $output/pre_ci.dta , clear
 			replace mprof12 = 10 if inlist(mprofstat, 630, 640 ) 
 			replace mprof12 = 11 if inlist(mprofstat, 400, 410, 411, 420, 421, 431 ) 
 			replace mprof12 = 12 if inlist(mprofstat, 422, 423, 424, 432, 433, 434 ) 
-			replace mprof12 = 13 if inlist(mprofstat, -1)
-			replace mprof12 = 100 if inlist(mprofstat, .)
+			replace mprof12 = 100 if inlist(mprofstat, -1, .)
 			
 			label define prof12_lbl 1 "no idea" 2 "lebte nicht mehr" 3 "nicht arbeitend" 4 "in Ausbildung/Wehrdienst" ///
 			5 "rentenbeziehend" 6 "Blue-collar" 7 "Dienstleistungs- & einfache Angestelltenberufe" ///
 			8 "Hochqualifizierte Angestellte und Führungskräfte" 9 "Beamte, einfache oder mittlerer Dienst" ///
 			10 "Beamte, gehobener oder höherer Dienst" 11 "Solo Selbständige und Freiberufler" 12 "Selbständige und Freiberufler mit Mitarbeitern" ///
-			13 "Hausperson" 100 "Missing"
+			100 "Missing"
 			
 			label values fprof12 prof12_lbl
 			label values mprof12 prof12_lbl
@@ -480,15 +482,6 @@ use $output/pre_ci.dta , clear
 	drop if (mcs < 0 & pcs <0 ) | (mcs <0 & pcs>0) | (mcs >0 & pcs <0 )			// 1 observation where mcs < 0 and pcs > 0
 	
 	// Ci 
-	* Recode Missings
-	mvdecode ///
-    yearofbirth gender ///
-    birthregion birthregion_ew urban ///  77,616
-    msedu fsedu fprof7 mprof7 fprofstat mprofstat ///
-    siblings mcs pcs ///
-    psample migback singleparent ///
-    , mv(-1 -2 -3 -4 -5 -8 -9)
-	
 	tab migback, mi 		// 0
 	tab siblings, mi 		// 9,676 
 	tab msedu, mi			// 9,110 
@@ -498,27 +491,35 @@ use $output/pre_ci.dta , clear
 	tab singleparent, mi	// 0
 	tab otherparent, mi		// 104 
 
-	* Basisdatensatz 1 mit "Keine Angabe" als Kategorie bei kategorialen Variablen
 	drop if missing(siblings, msedu, fsedu, mprofstat, fprofstat, otherparent)
+	
+	drop if msedu == 100
+	drop if fsedu == 100
+	drop if mprofstat == 100
+	drop if fprofstat == 100
+	drop if otherparent == 3
+	drop if singleparent == 3
 	
 	di _N
 	tab syear // zwischen 16,000 und 23,000 Beobachtungen in Jahren 2002-2022(2)
 	/*
-	      syear |      Freq.     Percent        Cum.
-	------------+-----------------------------------
-		   2002 |     18,800        8.61        8.61
-		   2004 |     18,900        8.65       17.26
-		   2006 |     18,835        8.62       25.89
-		   2008 |     17,092        7.83       33.71
-		   2010 |     16,205        7.42       41.13
-		   2012 |     17,668        8.09       49.22
-		   2014 |     21,833       10.00       59.22
-		   2016 |     20,695        9.48       68.69
-		   2018 |     22,917       10.49       79.19
-		   2020 |     23,579       10.80       89.98
-		   2022 |     21,875       10.02      100.00
-	------------+-----------------------------------
-		  Total |    218,399      100.00 */
+			  syear |      Freq.     Percent        Cum.
+		------------+-----------------------------------
+			   2002 |      9,115        6.72        6.72
+			   2004 |      9,698        7.15       13.87
+			   2006 |     10,646        7.85       21.72
+			   2008 |      9,985        7.36       29.08
+			   2010 |     10,271        7.57       36.65
+			   2012 |     13,346        9.84       46.49
+			   2014 |     16,305       12.02       58.51
+			   2016 |     14,639       10.79       69.30
+			   2018 |     16,782       12.37       81.67
+			   2020 |     15,460       11.40       93.07
+			   2022 |      9,397        6.93      100.00
+		------------+-----------------------------------
+		  Total |    135,644      100.00
+
+ */
 
 	save $output/base.dta , replace
 	
