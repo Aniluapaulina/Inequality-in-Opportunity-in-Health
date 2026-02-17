@@ -25,7 +25,7 @@ forvalues yr = 2002(2)2022 {
     foreach var in mcs pcs pcs_cfa50 mcs_cfa50 {
 
         quietly summarize `var' [fw=w] if syear == `yr'
-		/* quietly summarize `var' if syear == `yr' */
+		/* quietly summarize `var' if syear == `yr' */ // ungewichtet 
 
         post handle ///
             (`yr') ///
@@ -34,6 +34,10 @@ forvalues yr = 2002(2)2022 {
             (r(sd)) ///
 			(r(N)/1000000) // Angaben in Mio
 			/* (r(N)) */
+		
+		hist `var' [fw=w] if syear == `yr'
+		graph export "$output\Graphs\graph_`var'_`yr'.png", replace
+			
     }
 }
 
@@ -45,7 +49,6 @@ postclose handle
 
 	
 *** Unconditional Distribution of Circumstances
-
 forvalues yr = 2002(2)2022 {
     foreach var in migback birthregion birthregion_ew siblings age ///
                    migback_binary fsedu fprofstat singleparent ///
@@ -74,22 +77,23 @@ forvalues yr = 2002(2)2022 {
         restore
     }
 }
-
 	/*
 	- age: (bysort syear: su age) Durchschnittsalter sinkt von 70 Jahren in 2002 auf 50 Jahre in 2022
-	- migback: Anteil non-migback sinkt (nachvollziehbarer Weise) von 85% in 2002 auf 75% in 2022
-	- fprofstat und fsedu: 
-	- otherparent: Anteil otherparent steigt von 6% in 2002 auf % in 2022 
-	- singleparent: 
-	
-	
-	
+	- migback: Anteil non-migback sinkt (nachvollziehbarer Weise) von 85% auf 75% 
+	- fprofstat: Anteil bluecollar sinkt von 47% auf 36% 
+	- fprofstat: Anteil nichtarbeitend sinkt von 49% auf 38% während Dienstleistungs- & einfache Angestellte von 18% auf 29% steigt
+	- fsedu:Anteil Secondary steigt von 50% auf 62% während Upper secondary von 20 auf 12% sinkt
+	- msedu: Anteil Secondary sinkt von 66% auf 50% während Upper secondary (und Intermediate) steigen von 6(14) auf 14(24)
+	- otherparent: Anteil sinkt leicht von 4% auf 3% 
+	- singleparent: Anteil steigt von 14%  auf 16% 
+	- urban: vergleichbar 
+	- siblings: vergleichbar 
 	*/
 	
 
-	
 *** Conditional Distribution of Health outcomes 
-
+	graph bar (mean) mcs if gender == 0, over(age)
+	
 
 
 
