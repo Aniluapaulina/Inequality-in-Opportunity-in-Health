@@ -234,7 +234,7 @@ use $output/pre_ci.dta , clear
 	label var yearofbirth "Year of birth"
 	drop if yearofbirth == -1
 	
-	gen age = 2026 - yearofbirth
+	gen age = syear - yearofbirth
 	label var age "Age"
 	
 	gen age2 = age*age
