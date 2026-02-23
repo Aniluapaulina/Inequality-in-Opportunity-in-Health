@@ -7,10 +7,16 @@
 ********************************************************************************
 
 clear all
-use $output/base.dta, clear 
+use $output/basebase_withbw.dta, clear 
 *use $output/basenomissings.dta , clear
 tab syear
 
+* Bootrstrapping-based CI
+local B 100
+local wlist
+forvalues b = 1/`B' {
+    local wlist `wlist' w_`b'
+}
 
 * Panel analysis 
 tempfile results
@@ -33,7 +39,7 @@ forvalues yr = 2002(2)2022 {
 * MENTAL COMPONENT SCALE
 *------------------------------------------------------------------------------
 	* Outcome = SOEP MCS based on all weights from EFA 
-	reg mcs i.yearofbirth bodyheight i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
+	reg mcs i.yearofbirth i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
 	otherparent i.birthregion i.urban [fw=w]
     local R2_mcs_orig = e(r2)
 	
@@ -46,7 +52,7 @@ forvalues yr = 2002(2)2022 {
  
 	
 	** Outcome = MCS based on CFA 
-	reg mcs_cfa50  ii.yearofbirth bodyheight i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
+	reg mcs_cfa50  ii.yearofbirth  i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
 	otherparent i.birthregion i.urban [fw=w]
 	local R2_mcs_cfa = e(r2)
 
@@ -62,7 +68,7 @@ forvalues yr = 2002(2)2022 {
 * PHYSICAL COMPONNET SCALE 
 *------------------------------------------------------------------------------
 	* Outcome = SOEP MCS based on all weights from EFA 
-	reg pcs i.yearofbirth bodyheight i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
+	reg pcs i.yearofbirth  i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
 	otherparent i.birthregion i.urban [fw=w]
     local R2_pcs_orig = e(r2)
 
@@ -75,7 +81,7 @@ forvalues yr = 2002(2)2022 {
 	
 	
 	** Outcome = MCS based on CFA 
-	reg pcs_cfa50  i.yearofbirth bodyheight i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
+	reg pcs_cfa50  i.yearofbirth  i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
 	otherparent i.birthregion i.urban [fw=w]
 	local R2_pcs_cfa = e(r2)
 

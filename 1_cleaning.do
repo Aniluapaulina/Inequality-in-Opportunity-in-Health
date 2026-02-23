@@ -538,9 +538,10 @@ use $output/pre_ci.dta , clear
 			   2020 |     15,460       11.40       93.07
 			   2022 |      9,397        6.93      100.00
 		------------+-----------------------------------
-		  Total |    135,644      100.00
+			Total |    135,644      100.00
 
-	- loss of obersations in 2022 largely driven by the variables *sedu und *profstat 
+	- loss of obersations in 2022 largely driven by the variables *sedu, *profstat, aber auch otherparent und singleparent
+	- see 2_descriptivestatistics 
  */
 
 	save $output/base.dta , replace
@@ -624,6 +625,8 @@ SOEP ist keine einfache Zufallsstichprobe (gleiche Ziehungswahrscheinlichkeit), 
 - bsample ... bootstrap stichprobe mit Zurücklegen, stratifiziert nach Jahr (innerhalb jedes Jahres wird separat gezogen). Zurücklegen mit _N <= N im Stata(Jahr)
 */
 
+use $output/base.dta , clear
+
 set seed 12345
 
 gen bweight_0 = w																				// I: w ist der Hochrechnungsfaktor (Stichprobengewichte) 
@@ -636,7 +639,7 @@ forvalues b=1(1)$B {
 	replace bweight_`b'=bweight_`b'*w
 }
 
-save $output\base_withbw.dta
+save $output\base_withbw.dta , replace
 
 	
 	
