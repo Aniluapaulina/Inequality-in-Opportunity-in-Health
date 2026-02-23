@@ -121,7 +121,8 @@ save "$output/para_IOp_timeseries_raw.dta", replace
 * CI berechnen: Perzentile aus Bootstrap-Iterationen (b>=1)
 * Punktschätzer aus b=0 (Originalgewicht)
 *------------------------------------------------------------------------------
-use "$output/para_IOp_timeseries_raw.dta", clear 
+
+/* use "$output/para_IOp_timeseries_raw.dta", clear 
 * Zielvariablen definieren
 local varlist R2_mcs_orig R2_mcs_cfa /// /* GiniAbs_mcs_orig GiniRel_mcs_orig /// GiniAbs_mcs_cfa  GiniRel_mcs_cfa  /// */
               R2_pcs_orig R2_pcs_cfa /// /* GiniAbs_pcs_orig GiniRel_pcs_orig /// GiniAbs_pcs_cfa  GiniRel_pcs_cfa */
@@ -141,7 +142,8 @@ restore
 	
 	
 * CI aus Bootstrap-Iterationen 
-keep if boot_b >= 1
+
+ keep if boot_b >= 1
 
 /*
 foreach v of local varlist {
@@ -155,8 +157,8 @@ foreach v of local varlist {
     bysort year: egen sd_`v' = sd(`v')
     gen ci_lo_`v' = mean_`v' - 1.96*sd_`v'
     gen ci_hi_`v' = mean_`v' + 1.96*sd_`v'
-}
-
+	
+	
 keep year ci_lo_* ci_hi_*
 duplicates drop year, force
 sort year
@@ -164,7 +166,47 @@ sort year
 * Punktschätzer dazumergen
 merge 1:1 year using `point_estimates', nogenerate
 sort year
+}
 
+save "$output/para_IOp_timeseries.dta", replace
+
+*/
+*****************************************************
+use "$output/para_IOp_timeseries_raw.dta", clear
+
+local varlist R2_mcs_orig R2_mcs_cfa R2_pcs_orig R2_pcs_cfa
+
+* Punktschätzer (b=0)
+preserve
+    keep if boot_b == 0
+    keep year `varlist'
+    foreach v of local varlist {
+        rename `v' pt_`v'
+    }
+    tempfile point_estimates
+    save `point_estimates'
+restore
+
+* CI aus Bootstrap-Iterationen (b=1..B) – SOEP-Methode: SE-basiert
+keep if boot_b >= 1
+
+* Punktschätzer dazumergen für Abweichungsberechnung
+merge m:1 year using `point_estimates', nogen
+
+foreach v of local varlist {
+    gen sq_dev_`v' = (`v' - pt_`v')^2
+}
+
+collapse (mean) sq_dev_* pt_*, by(year)
+
+foreach v of local varlist {
+    gen se_`v'    = sqrt(sq_dev_`v')
+    gen ci_lo_`v' = pt_`v' - 1.96 * se_`v'
+    gen ci_hi_`v' = pt_`v' + 1.96 * se_`v'
+    drop sq_dev_`v' se_`v'
+}
+
+sort year
 save "$output/para_IOp_timeseries.dta", replace
 
 *------------------------------------------------------------------------------
