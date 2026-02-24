@@ -10,10 +10,6 @@ clear all
 use $output/base_withbw.dta, clear 
 tab syear
 
-*------------------------------------------------------------------------------
-* Tempfile speichert alle Ergebnisse: (B+1) Iterationen × 11 Jahre
-* boot_b=0 → Originalgewicht (bweight0), boot_b=1..10 → Bootstrap-Gewichte
-*------------------------------------------------------------------------------
 tempfile results
 postfile pf ///
     year boot_b ///
@@ -39,7 +35,7 @@ forvalues yr = 2002(2)2022 {
         *----------------------------------------------------------------------
         reg mcs i.yearofbirth i.migback gender siblings ///
             i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-            otherparent i.birthregion i.urban [fw=`curweight']
+            otherparent i.birthregion i.urban [aw=`curweight']
         local R2_mcs_orig = e(r2)
 
         /* capture drop mcs_orig_hat
@@ -55,7 +51,7 @@ forvalues yr = 2002(2)2022 {
         *----------------------------------------------------------------------
         reg mcs_cfa50 i.yearofbirth i.migback gender siblings ///
             i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-            otherparent i.birthregion i.urban [fw=`curweight']
+            otherparent i.birthregion i.urban [aw=`curweight']
         local R2_mcs_cfa = e(r2)
 
         /* capture drop mcs_cfa50_hat
@@ -71,7 +67,7 @@ forvalues yr = 2002(2)2022 {
         *----------------------------------------------------------------------
         reg pcs i.yearofbirth  i.migback gender siblings ///
             i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-            otherparent i.birthregion i.urban [fw=`curweight']
+            otherparent i.birthregion i.urban [aw=`curweight']
         local R2_pcs_orig = e(r2)
 
         /* capture drop pcs_orig_hat
@@ -87,7 +83,7 @@ forvalues yr = 2002(2)2022 {
         *----------------------------------------------------------------------
         reg pcs_cfa50 i.yearofbirth  i.migback gender siblings ///
             i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-            otherparent i.birthregion i.urban [fw=`curweight']
+            otherparent i.birthregion i.urban [aw=`curweight']
         local R2_pcs_cfa = e(r2)
 
         /* capture drop pcs_cfa50_hat
@@ -98,7 +94,7 @@ forvalues yr = 2002(2)2022 {
         local Gobs_pcs = $S_gini
         local GiniRel_pcs_cfa = `GiniAbs_pcs_cfa' / `Gobs_pcs' */
 
-        * Ergebnis posten
+        * Ergebnisse posten
         post pf ///
             (`yr') (`b') ///
             (`R2_mcs_orig') (`R2_mcs_cfa') /// /* (`GiniAbs_mcs_orig') (`GiniRel_mcs_orig') /// (`GiniAbs_mcs_cfa') (`GiniRel_mcs_cfa') /// */
@@ -108,6 +104,7 @@ forvalues yr = 2002(2)2022 {
 } 
 
 postclose pf
+
 
 *------------------------------------------------------------------------------
 * Rohergebnisse laden und speichern
@@ -171,12 +168,13 @@ sort year
 save "$output/para_IOp_timeseries.dta", replace
 
 */
-*****************************************************
+
+
 use "$output/para_IOp_timeseries_raw.dta", clear
 
 local varlist R2_mcs_orig R2_mcs_cfa R2_pcs_orig R2_pcs_cfa
 
-* Punktschätzer (b=0)
+*** Punktschätzer (b=0)
 preserve
     keep if boot_b == 0
     keep year `varlist'
@@ -187,10 +185,10 @@ preserve
     save `point_estimates'
 restore
 
-* CI aus Bootstrap-Iterationen (b=1..B) – SOEP-Methode: SE-basiert
+*** CI aus Bootstrap-Iterationen (b=1..B) – SOEP-Methode: SE-basiert
 keep if boot_b >= 1
 
-* Punktschätzer dazumergen für Abweichungsberechnung
+* Punktschätzer dazumergen für Abweichungsberechnung, genauer gesagt um die quadratische Abweichung der Punktschätzer von den anderen bootrapping-estimates zu berechen. aus dieses abweichungen wird dann der mittelwert (mit collapse) berechnet, die damit die varianz der Bootstrap-Iterationen ergibt 
 merge m:1 year using `point_estimates', nogen
 
 foreach v of local varlist {
@@ -200,14 +198,15 @@ foreach v of local varlist {
 collapse (mean) sq_dev_* pt_*, by(year)
 
 foreach v of local varlist {
-    gen se_`v'    = sqrt(sq_dev_`v')
-    gen ci_lo_`v' = pt_`v' - 1.96 * se_`v'
-    gen ci_hi_`v' = pt_`v' + 1.96 * se_`v'
+    gen se_`v'    = sqrt(sq_dev_`v') // Standardabweichung auf Basis der Varianz
+    gen ci_lo_`v' = pt_`v' - 1.96 * se_`v' // untere Grenze des KI
+    gen ci_hi_`v' = pt_`v' + 1.96 * se_`v'	// obere Grenze des KI
     drop sq_dev_`v' se_`v'
 }
 
 sort year
 save "$output/para_IOp_timeseries.dta", replace
+
 
 *------------------------------------------------------------------------------
 * Grafiken mit CI (mit vertikale!!!! Linien )
@@ -236,7 +235,8 @@ twoway ///
     ytitle("R-squared") xtitle("Year")
 graph export "$output/pcs_R2.png", replace
 
-*  Relativer Gini MCS 
+
+/*  Relativer Gini MCS 
 twoway ///
     (rcap ci_hi_GiniRel_mcs_orig ci_lo_GiniRel_mcs_orig year, lcolor(navy%50)) ///
     (rcap ci_hi_GiniRel_mcs_cfa  ci_lo_GiniRel_mcs_cfa  year, lcolor(maroon%50)) ///
@@ -256,4 +256,4 @@ twoway ///
     legend(order(3 "Original" 4 "CFA") rows(1)) ///
     title("Relative Inequality of Opportunity – PCS") ///
     ytitle("Relative Gini") xtitle("Year")
-graph export "$output/pcs_gini_relative.png", replace
+graph export "$output/pcs_gini_relative.png", replace */

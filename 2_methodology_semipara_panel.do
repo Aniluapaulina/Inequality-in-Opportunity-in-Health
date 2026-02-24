@@ -34,11 +34,10 @@ forvalues yr = 2002(2)2022 {
         * RIF-Regression
         reg rif_mcs_q`q' ///
 		i.yearofbirth bodyheight i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-		otherparent i.birthregion i.urban [fw=w]
+		otherparent i.birthregion i.urban [aw=w]
 
         local R2 = e(r2)
 
-        * ---> in Ergebnistabelle 
         post pf (`yr') (`q') (`R2')
 
         drop rif_mcs_q`q'
@@ -70,11 +69,10 @@ forvalues yr = 2002(2)2022 {
         * RIF-Regression
         reg rif_pcs_q`q' ///
             i.yearofbirth bodyheight i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-		otherparent i.birthregion i.urban [fw=w]
+		otherparent i.birthregion i.urban [aw=w]
 
         local R2 = e(r2)
-
-        * ---> in Ergebnistabelle 
+		
         post pf (`yr') (`q') (`R2')
 
         drop rif_pcs_q`q'

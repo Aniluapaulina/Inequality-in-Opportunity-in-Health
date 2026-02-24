@@ -40,7 +40,7 @@ forvalues yr = 2002(2)2022 {
 *------------------------------------------------------------------------------
 	* Outcome = SOEP MCS based on all weights from EFA 
 	reg mcs i.yearofbirth i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-	otherparent i.birthregion i.urban [fw=w]
+	otherparent i.birthregion i.urban [aw=w]
     local R2_mcs_orig = e(r2)
 	
     predict mcs_orig_hat, xb
@@ -53,7 +53,7 @@ forvalues yr = 2002(2)2022 {
 	
 	** Outcome = MCS based on CFA 
 	reg mcs_cfa50  ii.yearofbirth  i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-	otherparent i.birthregion i.urban [fw=w]
+	otherparent i.birthregion i.urban [aw=w]
 	local R2_mcs_cfa = e(r2)
 
     predict mcs_cfa50_hat, xb
@@ -68,8 +68,8 @@ forvalues yr = 2002(2)2022 {
 * PHYSICAL COMPONNET SCALE 
 *------------------------------------------------------------------------------
 	* Outcome = SOEP MCS based on all weights from EFA 
-	reg pcs i.yearofbirth  i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-	otherparent i.birthregion i.urban [fw=w]
+	reg pcs i.yearofbirth bodyheight i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
+	otherparent i.birthregion i.urban [aw=w]
     local R2_pcs_orig = e(r2)
 
     predict pcs_orig_hat, xb
@@ -82,7 +82,7 @@ forvalues yr = 2002(2)2022 {
 	
 	** Outcome = MCS based on CFA 
 	reg pcs_cfa50  i.yearofbirth  i.migback gender siblings i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-	otherparent i.birthregion i.urban [fw=w]
+	otherparent i.birthregion i.urban [aw=w]
 	local R2_pcs_cfa = e(r2)
 
     predict pcs_cfa50_hat, xb

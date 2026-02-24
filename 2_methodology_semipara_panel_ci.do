@@ -1,5 +1,9 @@
 ********************************************************************************
-***    RIF-Regression Panel Analysis mit Bootstrap-CI
+***    Authors: Paulina Mertinkat  						                             	  		
+***    Last modified: 07.12.2025											
+***    Do-file: 2_methodolody_para
+***	   Description: RIF-Regression Panel Analysis mit Bootstrap-CI                                   	
+***    Project: "IOP in health in Germany" 
 ********************************************************************************
 
 clear all
@@ -31,7 +35,7 @@ forvalues yr = 2002(2)2022 {
             reg rif_mcs_q`q' ///
                 i.yearofbirth  i.migback gender siblings ///
                 i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-                otherparent i.birthregion i.urban [pw=`curweight']
+                otherparent i.birthregion i.urban [aw=`curweight']
             local R2 = e(r2)
             
             post pf_mcs (`yr') (`q') (`b') (`R2')
@@ -64,7 +68,7 @@ forvalues yr = 2002(2)2022 {
             reg rif_pcs_q`q' ///
                 i.yearofbirth  i.migback gender siblings ///
                 i.msedu i.fsedu i.fprofstat i.mprofstat singleparent ///
-                otherparent i.birthregion i.urban [pw=`curweight']
+                otherparent i.birthregion i.urban [aw=`curweight']
             local R2 = e(r2)
             
             post pf_pcs (`yr') (`q') (`b') (`R2')
@@ -103,7 +107,7 @@ restore
 * CI aus Bootstrap-Iterationen (b=1..B) – SOEP-Methode: SE-basiert
 keep if boot_b >= 1
 
-* Punktschätzer dazumergen für Abweichungsberechnung
+* Punktschätzer dazumergen für Abweichungsberechnung, genauer gesagt um die quadratische Abweichung der Punktschätzer von den anderen bootrapping-estimates zu berechen. aus dieses abweichungen wird dann der mittelwert (mit collapse) berechnet, die damit die varianz der Bootstrap-Iterationen ergibt 
 merge m:1 year quantile using `point_estimates', nogen
 
 foreach v of local varlist {
@@ -113,9 +117,9 @@ foreach v of local varlist {
 collapse (mean) sq_dev_* pt_*, by(year quantile)
 
 foreach v of local varlist {
-    gen se_`v'    = sqrt(sq_dev_`v')
-    gen ci_lo_`v' = pt_`v' - 1.96 * se_`v'
-    gen ci_hi_`v' = pt_`v' + 1.96 * se_`v'
+    gen se_`v'    = sqrt(sq_dev_`v') // Standardabweichung auf Basis der Varianz
+    gen ci_lo_`v' = pt_`v' - 1.96 * se_`v' // untere Grenze des KI
+    gen ci_hi_`v' = pt_`v' + 1.96 * se_`v'	// obere Grenze des KI
     drop sq_dev_`v' se_`v'
 }
 

@@ -1,4 +1,10 @@
-* Description: Decriptive Statistics 
+********************************************************************************
+***    Authors: Paulina Mertinkat  						                             	  		
+***    Last modified: 23.02.2025											
+***    Do-file: 1_cleaning
+***	   Description: Decriptive Statistics 			                                     	
+***    Project: "IOP in helth in Germany" 
+********************************************************************************
 
 clear all
 use $output/base.dta, clear 
@@ -24,7 +30,7 @@ postfile handle int year str3 var double mean sd N using `results', replace
 forvalues yr = 2002(2)2022 {
     foreach var in mcs pcs pcs_cfa50 mcs_cfa50 {
 
-        quietly summarize `var' [fw=w] if syear == `yr'
+        quietly summarize `var' [aw=w] if syear == `yr'
 		/* quietly summarize `var' if syear == `yr' */ // ungewichtet 
 
         post handle ///
@@ -35,7 +41,7 @@ forvalues yr = 2002(2)2022 {
 			(r(N)/1000000) // Angaben in Mio
 			/* (r(N)) */
 		
-		hist `var' [fw=w] if syear == `yr'
+		hist `var' [aw=w] if syear == `yr'
 		graph export "$output\Graphs\graph_`var'_`yr'.png", replace
 			
     }
@@ -99,17 +105,12 @@ forvalues yr = 2002(2)2022 {
 
 
 
-
-
-
-
-
-
-
+************************************************
+* überarbeiten für latex 
 
 * Numerical variables
 estpost summarize  ///
-    mcs pcs siblings [fw = w]
+    mcs pcs siblings [aw = w]
 	
 esttab using "$output/table1_numerical.tex", ///
     cells("mean(fmt(2)) sd(fmt(2))") ///
@@ -121,7 +122,7 @@ esttab using "$output/table1_numerical.tex", ///
 
 * Kategorical variables 
 foreach v in gender msedu fsedu fprofstat mprofstat urban migback birthregion birthregion_ew migback singleparent otherparent {
-    qui estpost tabulate `v' [fw = w]
+    qui estpost tabulate `v' [aw = w]
 
     esttab using "$output/table1_`v'.tex", ///
         cells("pct(fmt(2))") ///
