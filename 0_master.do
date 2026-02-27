@@ -20,12 +20,17 @@ set seed 987654321
 global user "paulina"
 
 * Real SOEP source paths (available for configured users)
-if "`c(username)'" == "paulina" {
-    global Data    "C:\Users\merti\Documents\Data"
-    global v40     "$Data\Survey_data\soepdata"
-    global v39     "$Data\Survey_data\soepdatav39"
-    global v40_raw "$Data\Survey_data\soepdata/raw/"
+if "${user}"=="paulina" {	
+	global Data 		"C:\Users\merti\Documents\Data"
+    global v40 = 		"$Data\Survey_data\soepdata"
+	global v39 = 		"$Data\Survey_data\soepdatav39"
+	global v40_raw = 	"$Data\Survey_data\soepdata/raw/"
+	
+	
+	global data = "$Data\Survey_data\soepdata\"
+	global output = "C:\Users\merti\OneDrive\Dokumente\Universität\FU\Masterarbeit\Output"
 }
+
 
 if "`c(username)'" == "dgraeber" {
     global Data    "Q:\distribution\soep-core"
@@ -51,7 +56,7 @@ global SOEPyears 2002 2007 2012 2017
 *-------------------------------------------------------------------------------
 * INSTALLATION FILES 
 *-------------------------------------------------------------------------------
-global install = 1
+global install = 0
 
 if ${install} == 1 {
     cap noi ssc install iop, replace
@@ -60,6 +65,7 @@ if ${install} == 1 {
     cap noi ssc install shapowen, replace
     cap noi ssc install estout, replace
     cap noi ssc install distinct, replace
+	cap noi ssc install cfa1, replace
 }
 
 
@@ -100,6 +106,8 @@ else {
  
  
  
+di as res "Pipeline completed successfully."
+
  
  
  
