@@ -7,7 +7,7 @@
 ********************************************************************************
 
 clear all
-use $output/base.dta, clear 
+use $output/final.dta, clear 
 
 xtset pid syear
 count
@@ -30,7 +30,7 @@ postfile handle int year str3 var double mean sd N using `results', replace
 forvalues yr = 2002(2)2022 {
     foreach var in mcs pcs pcs_cfa50 mcs_cfa50 {
 
-        quietly summarize `var' [aw=w] if syear == `yr'
+        quietly summarize `var' [fw=w] if syear == `yr'
 		/* quietly summarize `var' if syear == `yr' */ // ungewichtet 
 
         post handle ///
@@ -41,7 +41,7 @@ forvalues yr = 2002(2)2022 {
 			(r(N)/1000000) // Angaben in Mio
 			/* (r(N)) */
 		
-		hist `var' [aw=w] if syear == `yr'
+		hist `var' [fw=w] if syear == `yr'
 		graph export "$output\Graphs\graph_`var'_`yr'.png", replace
 			
     }
@@ -53,7 +53,7 @@ postclose handle
 	list
 	restore 
 
-	
+
 *** Unconditional Distribution of Circumstances
 forvalues yr = 2002(2)2022 {
     foreach var in migback birthregion birthregion_ew siblings age ///
@@ -97,46 +97,6 @@ forvalues yr = 2002(2)2022 {
 	*/
 	
 
-*** Conditional Distribution of Health outcomes 
-	graph bar (mean) mcs if gender == 0, over(age)
-	
-
-
-
-
-
-************************************************
-* überarbeiten für latex 
-
-* Numerical variables
-estpost summarize  ///
-    mcs pcs siblings [aw = w]
-	
-esttab using "$output/table1_numerical.tex", ///
-    cells("mean(fmt(2)) sd(fmt(2))") ///
-    label ///
-    noobs ///
-    replace ///
-	tex
-	
-
-* Kategorical variables 
-foreach v in gender msedu fsedu fprofstat mprofstat urban migback birthregion birthregion_ew migback singleparent otherparent {
-    qui estpost tabulate `v' [aw = w]
-
-    esttab using "$output/table1_`v'.tex", ///
-        cells("pct(fmt(2))") ///
-        label ///
-        noobs ///
-        nomtitles ///
-        nonumber ///
-        replace ///
-        tex
-}
-
-
-
-	
 
 
 
@@ -144,32 +104,6 @@ foreach v in gender msedu fsedu fprofstat mprofstat urban migback birthregion bi
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-* Scales & age 
-// Combining age, cohort and year effects 
-
-twoway (scatter mcs age, mcolor(%30) msymbol(o) msize(small)) ///
-       (lfit mcs age, lcolor(blue) lwidth(medthick)) 
-		
-twoway (scatter pcs age, mcolor(%30) msymbol(o) msize(small)) ///
-       (lfit pcs age, lcolor(blue) lwidth(medthick)) 
-
-
-* There differences in the magnitude of socioeconomic health inequalities across age groups
-	* Further looking at HOW THOSE PATTERNS (Realtionship between health and age) differer by SES, measure of health, gender
 
 
 
