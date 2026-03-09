@@ -171,54 +171,54 @@ tab syear
 ** Alternatives to the SOEP PCS- and MCS-Scores (based on EFA -Exploratory Factor Analysis) - now: Confirmatory Factor Analysis (CFA)
 	* 0) Modelvergleich 
 		* Model 1: Zwei-Faktoren-CFA (PCS + MCS) mit korrelierten latenten Variablen
-				preserve
+			preserve
 				
-				keep if syear==2002 // Basisjahr
-				keep if valid == 1 // Siehe Nübling et  al. (2006) "Daten nur Befragte verwendet, die für alle 12 Variablen gültige Angaben aufwiesen"
-				drop if mh_nbs <-8 | sf_nbs <-8  | bp_nbs <-8  | pf_nbs <-8 // @daniel: verstehe nicht, warum das valid ist, sogar mit im Survey Paper HEALTH steht
+			keep if syear==2002 // Basisjahr
+			keep if valid == 1 // Siehe Nübling et  al. (2006) "Daten nur Befragte verwendet, die für alle 12 Variablen gültige Angaben aufwiesen"
+			drop if mh_nbs <-8 | sf_nbs <-8  | bp_nbs <-8  | pf_nbs <-8 // @daniel: verstehe nicht, warum das valid ist, sogar im Survey Paper HEALTH steht
 				
-				sem (PCS -> rp_nbs bp_nbs gh_nbs pf_nbs) (MCS -> vt_nbs sf_nbs re_nbs mh_nbs), cov(PCS*MCS) standardized
-				* ohne das Argument cov unterstelle ich wieder orthogonale Faktoren, damit künstliche Unabhängigkeit, was ich ja nicht will
-				* corr = 32.58 / sqrt(76.09 × 25.56) ≈ 0.74 ....  positive empirische Korrelation
+			sem (PCS -> rp_nbs bp_nbs gh_nbs pf_nbs) (MCS -> vt_nbs sf_nbs re_nbs mh_nbs), cov(PCS*MCS) standardized
+			* ohne das Argument cov unterstelle ich wieder orthogonale Faktoren, damit künstliche Unabhängigkeit, was ich ja nicht will
+			* corr = 32.58 / sqrt(76.09 × 25.56) ≈ 0.74 ....  positive empirische Korrelation
+			
+			* Fit-Statistiken anzeigen
+			estat gof, stats(all)
+			estat ic
+			
+			* Faktor-Score-Koeffizienten
+			predict pcs_cfa mcs_cfa, latent
+			
+			restore
 				
-				* Fit-Statistiken anzeigen
-				estat gof, stats(all)
-				estat ic
+		* Model 2: Eindimensionale Struktur (G)
+			preserve
+			
+			keep if syear==2002 // Basisjahr
+			keep if valid == 1 // Siehe Nübling et  al. (2006) "Daten nur Befragte verwendet, die für alle 12 Variablen gültige Angaben aufwiesen"
+			drop if mh_nbs <-8 | sf_nbs <-8  | bp_nbs <-8  | pf_nbs <-8 // @daniel: verstehe nicht, warum das valid ist, sogar im Survey Paper HEALTH steht
 				
-				* Faktor-Score-Koeffizienten
-				predict pcs_cfa mcs_cfa, latent
+			sem (G -> rp_nbs bp_nbs gh_nbs pf_nbs vt_nbs sf_nbs re_nbs mh_nbs), standardized 
 				
-				restore
+			* Fit-Statistiken anzeigen
+			estat gof, stats(all)
+			estat ic
 				
-			* Model 2: Eindimensionale Struktur (G)
-				preserve
+			* Faktor-Score-Koeffizienten
+			predict G_cfa, latent
 				
-				keep if syear==2002 // Basisjahr
-				keep if valid == 1 // Siehe Nübling et  al. (2006) "Daten nur Befragte verwendet, die für alle 12 Variablen gültige Angaben aufwiesen"
-				drop if mh_nbs <-8 | sf_nbs <-8  | bp_nbs <-8  | pf_nbs <-8 // @daniel: verstehe nicht, warum das valid ist, sogar mit im Survey Paper HEALTH steht
+			restore
 				
-				sem (G -> rp_nbs bp_nbs gh_nbs pf_nbs vt_nbs sf_nbs re_nbs mh_nbs), standardized 
-				
-				* Fit-Statistiken anzeigen
-				estat gof, stats(all)
-				estat ic
-				
-				* Faktor-Score-Koeffizienten
-				predict G_cfa, latent
-				
-				restore
-				
-				/*
-				| Index | Zwei-Faktoren | Ein-Faktor | Interpretation                                            |
-				| ----- | ------------- | ---------- | --------------------------------------------------------- |
-				| RMSEA | 0.130         | 0.187      | Zwei-Faktoren näher an akzeptabel, Ein-Faktor zu schlecht |
-				| CFI   | 0.92          | 0.825      | Zwei-Faktoren deutlich besser                             |
-				| TLI   | 0.883         | 0.756      | Zwei-Faktoren besser, Ein-Faktor problematisch            |
-				| SRMR  | 0.058         | 0.083      | Zwei-Faktoren gut, Ein-Faktor knapp über Schwelle         |
-				| CD    | 0.968         | 0.900      | Zwei-Faktoren erklärt mehr Varianz                        |
-				| AIC   | 1,288,000     | 1,297,000  | Zwei-Faktoren besser                                      |
-				| BIC   | 1,288,000     | 1,297,000  | Zwei-Faktoren besser                                      |
-				*/
+			/*
+			| Index | Zwei-Faktoren | Ein-Faktor | Interpretation                                            |
+			| ----- | ------------- | ---------- | --------------------------------------------------------- |
+			| RMSEA | 0.130         | 0.187      | Zwei-Faktoren näher an akzeptabel, Ein-Faktor zu schlecht |
+			| CFI   | 0.92          | 0.825      | Zwei-Faktoren deutlich besser                             |
+			| TLI   | 0.883         | 0.756      | Zwei-Faktoren besser, Ein-Faktor problematisch            |
+			| SRMR  | 0.058         | 0.083      | Zwei-Faktoren gut, Ein-Faktor knapp über Schwelle         |
+			| CD    | 0.968         | 0.900      | Zwei-Faktoren erklärt mehr Varianz                        |
+			| AIC   | 1,288,000     | 1,297,000  | Zwei-Faktoren besser                                      |
+			| BIC   | 1,288,000     | 1,297,000  | Zwei-Faktoren besser                                      |
+			*/
 				
 		
 	* 1) Schätzung der CFA für Basisjahr: Zwei-Faktoren-CFA mit je 4 Subskalen. 

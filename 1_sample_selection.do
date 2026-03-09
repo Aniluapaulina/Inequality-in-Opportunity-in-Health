@@ -89,7 +89,8 @@ use $output/base_withbw.dta , clear
 	keep pid syear phrf pbleib w psample mcs pcs pcs_cfa50 mcs_cfa50 ///
 	yearofbirth migback_binary migback gender ///
 	siblings msedu fsedu fprof7 mprof7 fprofstat mprofstat singleparent otherparent ///
-	birthregion_ew birthregion urban age age2
+	birthregion_ew birthregion urban age age2 ///
+	bweight_*
 	
 	
 	save $output/final.dta, replace
