@@ -31,7 +31,7 @@ keep if syear == 2020
 	
 
 *------------------------------------------------------------------------------
-* panel 
+* panel baseline
 *------------------------------------------------------------------------------
 clear all
 use $output/final.dta, clear 
@@ -122,89 +122,86 @@ save "$output/shapley_para_new.dta", replace
 *------------------------------------------------------------------------------
 *use "$output/shapley_para.dta", clear 
 use "$output/shapley_para_new.dta", clear 
+	// die outcome-Spalte wurde falsch beschriftet. Zweimal MCS und PCS jeweils anstatt mit _cfa50
+	replace healthoutcome = "pcs_cfa50" if _n > 22 & _n <= 33
+	replace healthoutcome = "mcs_cfa50" if _n > 33
 
-/* Balken / Jahr 
-levelsof year, local(years)
-
-foreach outcome in pcs mcs {
-	foreach y of local years {
-		graph bar ///
-			shap_yearofbirth shap_migback shap_gender shap_siblings ///
-			shap_msedu shap_fsedu shap_fprofstat shap_mprofstat ///
-			shap_singleparent shap_otherparent shap_birthregion shap_urban ///
-			if year == `y' & healthoutcome == "`outcome'", ///
-			title("Shapley decomposition PCS - `y'") ///
-			ytitle("Relative contribution") ///
-			legend(off) ///
-			name(bar_`y', replace)
-			
-		graph export "$output/shapley_para_`y'_`outcome'.png", replace 
-	}
-}
-*/
 
 *** Shapley Decomposition nur Anteile - Gestapelte Balken über alle Jahre
-graph bar (asis) ///
-    shap* ///
+graph bar /* hbar */ (asis) ///
+    shap_* ///
     if healthoutcome=="pcs", ///
     over(year) ///
     stack ///
 	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
 	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition PCS – all years") ///
-    ytitle("% contribution of circumstances to IOp") ///
-    legend(cols(2))
+    title("Shapley decomposition PCS, relative") ///
+    ytitle("% contribution to IOp", size(small)) ///
+    legend(cols(4) size(small) region(lwidth(none)) ///
+	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
+              5 "msedu" 6 "fsedu" 7 "fprofstat" ///
+              8 "mprofstat" 9 "singleparent" 10 "otherparent" ///
+              11 "birthregion" 12 "urban"))
+	
+	graph export "$output/pcs_mean_shapley_absolute.png", replace
 
-graph hbar (asis) ///
-    shap* ///
-    if healthoutcome=="pcs", ///
-    over(year, sort(year)) ///
+	
+graph bar /* hbar */ (asis) ///
+    shap_* ///
+    if healthoutcome=="mcs", ///
+    over(year) ///
     stack ///
-    outergap(50) ///
 	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
 	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition PCS – all years") ///
-    legend(cols(2))
+    title("Shapley decomposition MCS, relative") ///
+    ytitle("% contribution to IOp", size(small)) ///
+    legend(cols(4) size(small) region(lwidth(none)) ///
+	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
+              5 "msedu" 6 "fsedu" 7 "fprofstat" ///
+              8 "mprofstat" 9 "singleparent" 10 "otherparent" ///
+              11 "birthregion" 12 "urban"))
 	
-
+	graph export "$output/mcs_mean_shapley_absolute.png", replace
+	
+	
 *** Shapley Decomposition mit absoluten IOps- Gestapelte Balken über alle Jahre
-*use "$output/shapley_para.dta", clear 
-use "$output/shapley_para_new.dta", clear 
-
-	merge 1:1 year healthoutcome using "$output/para_pt_IOp_timeseries.dta", nogen // IOp Punktschätzer 
-	
-	gen pt_R2_100 = pt_R2_ * 100
-	
-	gen shap_yearofbirth_share = shap_yearofbirth * pt_R2_100
-	gen shap_migback_share = shap_migback * pt_R2_100
-	gen shap_gender_share = shap_gender * pt_R2_100
-	gen shap_siblings_share = shap_siblings * pt_R2_100
-    gen shap_msedu_share = shap_msedu * pt_R2_100
-    gen shap_fsedu_share = shap_fsedu * pt_R2_100
-    gen shap_fprofstat_share = shap_fprofstat * pt_R2_100
-    gen shap_mprofstat_share = shap_mprofstat * pt_R2_100
-    gen shap_singleparent_share = shap_singleparent * pt_R2_100
-    gen shap_otherparent_share = shap_otherparent * pt_R2_100
-    gen shap_birthregion_share = shap_birthregion * pt_R2_100
-    gen shap_urban_share = shap_urban * pt_R2_100
-	
-
-graph bar (asis) ///
-    shap*_share ///
+graph bar /* hbar */ (asis) ///
+    relshap_* ///
     if healthoutcome=="pcs", ///
     over(year) ///
     stack ///
 	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
 	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition PCS – all years") ///
-    ytitle("% contribution of circumstances to IOp") ///
-    legend(cols(2))
+    title("Shapley decomposition PCS, absolute") ///
+    ytitle("% contribution to IOp", size(small)) ///
+    legend(cols(4) size(small) region(lwidth(none)) ///
+	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
+              5 "msedu" 6 "fsedu" 7 "fprofstat" ///
+              8 "mprofstat" 9 "singleparent" 10 "otherparent" ///
+              11 "birthregion" 12 "urban"))
+	
+	graph export "$output/pcs_mean_shapley_relative.png", replace
+	
+graph bar /* hbar */ (asis) ///
+    relshap_* ///
+    if healthoutcome=="mcs", ///
+    over(year) ///
+    stack ///
+	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
+	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
+    title("Shapley decomposition MCS, absolute") ///
+    ytitle("% contribution to IOp", size(small)) ///
+    legend(cols(4) size(small) region(lwidth(none)) ///
+	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
+              5 "msedu" 6 "fsedu" 7 "fprofstat" ///
+              8 "mprofstat" 9 "singleparent" 10 "otherparent" ///
+              11 "birthregion" 12 "urban"))
+	
+	graph export "$output/mcs_mean_shapley_relative.png", replace
 	
 	
 	
 	
-	
-	
-	
+
 	
 	
