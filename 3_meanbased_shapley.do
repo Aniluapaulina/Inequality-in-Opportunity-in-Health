@@ -127,7 +127,7 @@ use "$output/shapley_para_new.dta", clear
 	replace healthoutcome = "mcs_cfa50" if _n > 33
 
 
-*** Shapley Decomposition nur Anteile - Gestapelte Balken über alle Jahre
+*** Shapley Decomposition - gestapelt Balken über alle Jahre --> Anteile am absolute Iop
 graph bar /* hbar */ (asis) ///
     shap_* ///
     if healthoutcome=="pcs", ///
@@ -135,7 +135,7 @@ graph bar /* hbar */ (asis) ///
     stack ///
 	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
 	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition PCS, relative") ///
+    title("Shapley decomposition PCS, absolute") ///
     ytitle("% contribution to IOp", size(small)) ///
     legend(cols(4) size(small) region(lwidth(none)) ///
 	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
@@ -153,7 +153,7 @@ graph bar /* hbar */ (asis) ///
     stack ///
 	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
 	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition MCS, relative") ///
+    title("Shapley decomposition MCS, absolute") ///
     ytitle("% contribution to IOp", size(small)) ///
     legend(cols(4) size(small) region(lwidth(none)) ///
 	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
@@ -164,7 +164,7 @@ graph bar /* hbar */ (asis) ///
 	graph export "$output/mcs_mean_shapley_absolute.png", replace
 	
 	
-*** Shapley Decomposition mit absoluten IOps- Gestapelte Balken über alle Jahre
+*** Shapley Decomposition mit gestapelte Balken über alle Jahre --> relative Anteile an 1
 graph bar /* hbar */ (asis) ///
     relshap_* ///
     if healthoutcome=="pcs", ///
@@ -172,7 +172,7 @@ graph bar /* hbar */ (asis) ///
     stack ///
 	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
 	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition PCS, absolute") ///
+    title("Shapley decomposition PCS, relative") ///
     ytitle("% contribution to IOp", size(small)) ///
     legend(cols(4) size(small) region(lwidth(none)) ///
 	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
@@ -189,7 +189,7 @@ graph bar /* hbar */ (asis) ///
     stack ///
 	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
 	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition MCS, absolute") ///
+    title("Shapley decomposition MCS, relative") ///
     ytitle("% contribution to IOp", size(small)) ///
     legend(cols(4) size(small) region(lwidth(none)) ///
 	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
