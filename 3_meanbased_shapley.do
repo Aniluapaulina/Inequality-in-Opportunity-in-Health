@@ -118,7 +118,7 @@ save "$output/shapley_para_new.dta", replace
 
 
 *------------------------------------------------------------------------------
-* graphs
+* graphs baseline 
 *------------------------------------------------------------------------------
 *use "$output/shapley_para.dta", clear 
 use "$output/shapley_para_new.dta", clear 
@@ -128,80 +128,191 @@ use "$output/shapley_para_new.dta", clear
 
 
 *** Shapley Decomposition - gestapelt Balken über alle Jahre --> Anteile am absolute Iop
-graph bar /* hbar */ (asis) ///
+foreach var in /* pcs mcs */ pcs_cfa50 mcs_cfa50 {
+	
+	graph bar /* hbar */ (asis) ///
     shap_* ///
-    if healthoutcome=="pcs", ///
+    if healthoutcome=="`var'", ///
     over(year) ///
     stack ///
-	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
-	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition PCS, absolute") ///
+	/// YOB: Grau
+    bar(1,  color("150 150 150")) ///
+    /// Demographic: Blautöne (migback, gender, siblings)
+    bar(2,  color("55 126 184")) ///
+    bar(3,  color("107 174 214")) ///
+    bar(4,  color("189 215 231")) ///
+    /// SES: Rottöne (msedu, fsedu, fprofstat, mprofstat)
+    bar(5,  color("165 0 38"))   ///  dunkelrot - msedu
+    bar(6,  color("215 48 39"))  ///  rot - fsedu
+    bar(7,  color("244 109 67")) ///  lachs - fprofstat
+    bar(8,  color("253 190 152")) /// helllachs - mprofstat
+    /// Family structure: Grüntöne (singleparent, otherparent)
+    bar(9,  color("35 139 69")) ///
+    bar(10, color("116 196 118")) ///
+    /// Geographic: Lilatöne (birthregion, urban)
+    bar(11, color("117 107 177")) ///
+    bar(12, color("188 189 220")) ///
+    title("Shapley decomposition `var', absolute") ///
     ytitle("% contribution to IOp", size(small)) ///
     legend(cols(4) size(small) region(lwidth(none)) ///
-	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
-              5 "msedu" 6 "fsedu" 7 "fprofstat" ///
-              8 "mprofstat" 9 "singleparent" 10 "otherparent" ///
-              11 "birthregion" 12 "urban"))
+	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" 5 "msedu" 6 "fsedu" 7 "fprofstat" ///
+		  8 "mprofstat" 9 "singleparent" 10 "otherparent" 11 "birthregion" 12 "urban"))
 	
-	graph export "$output/pcs_mean_shapley_absolute.png", replace
+	graph export "$output/`var'_mean_shapley_absolute.png", replace
+}
 
-	
-graph bar /* hbar */ (asis) ///
-    shap_* ///
-    if healthoutcome=="mcs", ///
-    over(year) ///
-    stack ///
-	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
-	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition MCS, absolute") ///
-    ytitle("% contribution to IOp", size(small)) ///
-    legend(cols(4) size(small) region(lwidth(none)) ///
-	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
-              5 "msedu" 6 "fsedu" 7 "fprofstat" ///
-              8 "mprofstat" 9 "singleparent" 10 "otherparent" ///
-              11 "birthregion" 12 "urban"))
-	
-	graph export "$output/mcs_mean_shapley_absolute.png", replace
-	
 	
 *** Shapley Decomposition mit gestapelte Balken über alle Jahre --> relative Anteile an 1
-graph bar /* hbar */ (asis) ///
+foreach var in /* pcs mcs */ pcs_cfa50 mcs_cfa50 {
+	
+	graph bar /* hbar */ (asis) ///
     relshap_* ///
-    if healthoutcome=="pcs", ///
+    if healthoutcome=="`var'", ///
     over(year) ///
     stack ///
-	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
-	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition PCS, relative") ///
+	/// YOB: Grau
+    bar(1,  color("150 150 150")) ///
+    /// Demographic: Blautöne (migback, gender, siblings)
+    bar(2,  color("55 126 184")) ///
+    bar(3,  color("107 174 214")) ///
+    bar(4,  color("189 215 231")) ///
+    /// SES: Rottöne (msedu, fsedu, fprofstat, mprofstat)
+    bar(5,  color("165 0 38"))   ///  dunkelrot - msedu
+    bar(6,  color("215 48 39"))  ///  rot - fsedu
+    bar(7,  color("244 109 67")) ///  lachs - fprofstat
+    bar(8,  color("253 190 152")) /// helllachs - mprofstat
+    /// Family structure: Grüntöne (singleparent, otherparent)
+    bar(9,  color("35 139 69")) ///
+    bar(10, color("116 196 118")) ///
+    /// Geographic: Lilatöne (birthregion, urban)
+    bar(11, color("117 107 177")) ///
+    bar(12, color("188 189 220")) ///
+    title("Shapley decomposition `var', relative") ///
     ytitle("% contribution to IOp", size(small)) ///
     legend(cols(4) size(small) region(lwidth(none)) ///
-	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
-              5 "msedu" 6 "fsedu" 7 "fprofstat" ///
-              8 "mprofstat" 9 "singleparent" 10 "otherparent" ///
-              11 "birthregion" 12 "urban"))
+	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" 5 "msedu" 6 "fsedu" 7 "fprofstat" ///
+		  8 "mprofstat" 9 "singleparent" 10 "otherparent" 11 "birthregion" 12 "urban"))
 	
-	graph export "$output/pcs_mean_shapley_relative.png", replace
+	graph export "$output/`var'_mean_shapley_relative.png", replace
 	
-graph bar /* hbar */ (asis) ///
-    relshap_* ///
-    if healthoutcome=="mcs", ///
-    over(year) ///
-    stack ///
-	bar(1, color(gs14)) bar(2, color(orange)) bar(3, color(blue)) bar(4, color(green)) bar(5, color(red)) bar(6, color(purple)) ///
-	bar(7, color(teal)) bar(8, color(yellow)) bar(9, color(pink)) bar(10, color(brown)) bar(11, color(navy)) bar(12, color(maroon)) ///
-    title("Shapley decomposition MCS, relative") ///
-    ytitle("% contribution to IOp", size(small)) ///
-    legend(cols(4) size(small) region(lwidth(none)) ///
-	order(1 "yearofbirth" 2 "migback" 3 "gender" 4 "siblings" ///
-              5 "msedu" 6 "fsedu" 7 "fprofstat" ///
-              8 "mprofstat" 9 "singleparent" 10 "otherparent" ///
-              11 "birthregion" 12 "urban"))
+}
+
 	
-	graph export "$output/mcs_mean_shapley_relative.png", replace
+*------------------------------------------------------------------------------
+* graphs mit aggregierten kategorien  
+*------------------------------------------------------------------------------
+use "$output/shapley_para_new.dta", clear 
+	// die outcome-Spalte wurde falsch beschriftet. Zweimal MCS und PCS jeweils anstatt mit _cfa50
+	replace healthoutcome = "pcs_cfa50" if _n > 22 & _n <= 33
+	replace healthoutcome = "mcs_cfa50" if _n > 33
 	
-	
-	
+* Kategorien zusammenfassen (Summe der Shapley-Anteile relativ)
+gen relshap_cat1_yob         = relshap_yearofbirth
+gen relshap_cat2_demographic = relshap_migback + relshap_gender + relshap_siblings
+gen relshap_cat3_family      = relshap_singleparent + relshap_otherparent
+gen relshap_cat4_ses	     = relshap_msedu + relshap_fsedu + relshap_fprofstat + relshap_mprofstat
+gen relshap_cat5_geo         = relshap_birthregion + relshap_urban
+
+* Kategorien zusammenfassen (Summe der Shapley-Anteile absolut)
+gen shap_cat1_yob         = shap_yearofbirth
+gen shap_cat2_demographic = shap_migback + shap_gender + shap_siblings
+gen shap_cat3_family      = shap_singleparent + shap_otherparent
+gen shap_cat4_ses	     = shap_msedu + shap_fsedu + shap_fprofstat + shap_mprofstat
+gen shap_cat5_geo         = shap_birthregion + shap_urban
+
+
+* absolute
+foreach var in /* pcs mcs */ pcs_cfa50 mcs_cfa50 {
+    graph bar (asis) ///
+        shap_cat1_yob shap_cat2_demographic shap_cat3_family ///
+        shap_cat4_ses shap_cat5_geo ///
+        if healthoutcome == "`var'", ///
+        over(year) ///
+        stack ///
+        bar(1, color("150 150 150")) ///  Grau (YOB)
+        bar(2, color("55 126 184"))  ///  Blau (Demographic)
+        bar(3, color("35 139 69"))   ///  Grün (Family)
+        bar(4, color("165 0 38"))    ///  Rot (SES)
+        bar(5, color("117 107 177")) ///  Lila (Geographic)
+        title("Shapley decomposition `var', absolute") ///
+        ytitle("% contribution to IOp", size(small)) ///
+        legend(cols(3) size(small) region(lwidth(none)) ///
+            order(1 "Year of birth" 2 "Other demographic" 3 "Family structure" ///
+                  4 "SES" 5 "Geographic origin"))
+    graph export "$output/`var'_mean_shapley_absolute_cat.png", replace
+}
 	
 
+* relative
+foreach var in /* pcs mcs */ pcs_cfa50 mcs_cfa50 {
+    graph bar (asis) ///
+        relshap_cat1_yob relshap_cat2_demographic relshap_cat3_family ///
+        relshap_cat4_ses relshap_cat5_geo ///
+        if healthoutcome == "`var'", ///
+        over(year) ///
+        stack ///
+         bar(1, color("150 150 150")) ///  Grau (YOB)
+        bar(2, color("55 126 184"))  ///  Blau (Demographic)
+        bar(3, color("35 139 69"))   ///  Grün (Family)
+        bar(4, color("165 0 38"))    ///  Rot (SES)
+        bar(5, color("117 107 177")) ///  Lila (Geographic)
+        title("Shapley decomposition `var', relative") ///
+        ytitle("% contribution to IOp", size(small)) ///
+        legend(cols(3) size(small) region(lwidth(none)) ///
+            order(1 "Year of birth" 2 "Other demographic" 3 "Family structure" ///
+                  4 "SES" 5 "Geographic origin"))
+    graph export "$output/`var'_mean_shapley_relative_cat.png", replace
+}
+	
+
+
+
+*------------------------------------------------------------------------------
+* tabellen mit aggregierten kategorien  
+*-----------------------------------------------------------------------------
+foreach var in /* pcs mcs */ pcs_cfa50 mcs_cfa50 {
+    di "=== `var' ==="
+    tabstat  relshap_cat1_yob relshap_cat2_demographic relshap_cat3_family relshap_cat4_ses relshap_cat5_geo ///
+            if healthoutcome == "`var'", ///
+            by(year) format(%6.3f)
+}
+		
+*** für latex 
+foreach var in pcs_cfa50 mcs_cfa50 {
+    preserve
+    keep if healthoutcome == "`var'"
+    keep year relshap_cat1_yob relshap_cat2_demographic relshap_cat3_family ///
+             relshap_cat4_ses relshap_cat5_geo
+
+    foreach v of varlist relshap_cat* {
+        replace `v' = round(`v' * 100, 0.1)
+    }
+
+	* Header schreiben
+    file open fh using "$output/table_`var'.tex", write replace
+    file write fh "\begin{tabular}{lrrrrr}" _n
+    file write fh "\hline" _n
+    file write fh "\textbf{Year} & \textbf{YOB} & \textbf{Demographic} & \textbf{Family} & \textbf{SES} & \textbf{Geographic} \\" _n
+    file write fh "\hline" _n
+
+    * Zeilen schreiben
+    forvalues i = 1/`=_N' {
+        file write fh ///
+            (year[`i']) " & " ///
+            (relshap_cat1_yob[`i']) " & " ///
+            (relshap_cat2_demographic[`i']) " & " ///
+            (relshap_cat3_family[`i']) " & " ///
+            (relshap_cat4_ses[`i']) " & " ///
+            (relshap_cat5_geo[`i']) " \\" _n
+    }
+
+    file write fh "\hline" _n
+    file write fh "\end{tabular}" _n
+    file close fh
+
+    restore
+}
+	
+	
 	
 	

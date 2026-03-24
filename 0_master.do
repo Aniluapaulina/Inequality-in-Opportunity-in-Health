@@ -10,7 +10,6 @@
 *-------------------------------------------------------------------------------
 * SET GLOBALS 
 *-------------------------------------------------------------------------------
-
 version 14 						 
 clear
 set more off, permanently
@@ -66,6 +65,7 @@ if ${install} == 1 {
     cap noi ssc install estout, replace
     cap noi ssc install distinct, replace
 	cap noi ssc install cfa1, replace
+	cap noi ssc install listtex, replace
 }
 
 *-------------------------------------------------------------------------------
