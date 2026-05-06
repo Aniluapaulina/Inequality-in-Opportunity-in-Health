@@ -16,7 +16,7 @@ preserve
 
 keep if syear == 2022
 
-shapowen c.age c.age#c.age i.migback gender siblings ///
+shapowen (c.age c.age#c.age) i.migback gender siblings ///
                 i.msedu i.fsedu i.fprofstat i.mprofstat ///
                 singleparent otherparent ///
                 i.birthregion i.urban, ///
@@ -70,7 +70,7 @@ foreach outcome in pcs_cfa50 mcs_cfa50 {
             capture drop rif_`outcome'
             egen rif_`outcome' = rifvar(`outcome'), q(`q') weight(w)
 
-            shapowen c.age c.age#c.age i.migback gender siblings ///
+            shapowen (c.age c.age#c.age) i.migback gender siblings ///
                 i.msedu i.fsedu i.fprofstat i.mprofstat ///
                 singleparent otherparent ///
                 i.birthregion i.urban, ///
