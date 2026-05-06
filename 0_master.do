@@ -51,6 +51,9 @@ global seed "12345"
 global SOEPyears 2002 2007 2012 2017
 				    
 
+set scheme s1color
+graph set window fontface "Times New Roman"
+set scheme s1mono
 
 *-------------------------------------------------------------------------------
 * INSTALLATION FILES 

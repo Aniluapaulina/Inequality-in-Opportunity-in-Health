@@ -175,7 +175,7 @@ tab syear
 				
 			keep if syear==2002 // Basisjahr
 			keep if valid == 1 // Siehe Nübling et  al. (2006) "Daten nur Befragte verwendet, die für alle 12 Variablen gültige Angaben aufwiesen"
-			drop if mh_nbs <-8 | sf_nbs <-8  | bp_nbs <-8  | pf_nbs <-8 // @daniel: verstehe nicht, warum das valid ist, sogar im Survey Paper HEALTH steht
+			drop if mh_nbs <=-8 | sf_nbs <=-8  | bp_nbs <=-8  | pf_nbs <-8 // @daniel: verstehe nicht, warum das valid ist, sogar im Survey Paper HEALTH 
 				
 			sem (PCS -> rp_nbs bp_nbs gh_nbs pf_nbs) (MCS -> vt_nbs sf_nbs re_nbs mh_nbs), cov(PCS*MCS) standardized
 			* ohne das Argument cov unterstelle ich wieder orthogonale Faktoren, damit künstliche Unabhängigkeit, was ich ja nicht will
@@ -217,28 +217,47 @@ tab syear
 			| SRMR  | 0.058         | 0.083      | Zwei-Faktoren gut, Ein-Faktor knapp über Schwelle         |
 			| CD    | 0.968         | 0.900      | Zwei-Faktoren erklärt mehr Varianz                        |
 			| AIC   | 1,288,000     | 1,297,000  | Zwei-Faktoren besser                                      |
-			| BIC   | 1,288,000     | 1,297,000  | Zwei-Faktoren besser                                      |
+			| BIC   | 1,288,000     | 1,297,000  | Zwei-Faktoren besser  |
+			--> Zwei-Faktoren besser 
 			*/
 				
-		
-	* 1) Schätzung der CFA für Basisjahr: Zwei-Faktoren-CFA mit je 4 Subskalen. 
-		sem (PCS -> rp_nbs bp_nbs gh_nbs pf_nbs) (MCS -> vt_nbs sf_nbs re_nbs mh_nbs) if syear == 2002 & valid == 1 & ///
-		(mh_nbs >=-8 | sf_nbs >=-8  | bp_nbs >=-8 | pf_nbs >=-8 ), cov(PCS*MCS) standardized 
-				
-		predict pcs_cfa mcs_cfa, latent
+use $output/pre_health.dta , replace 
+	
+	* 1) Schätzung der CFA für Basisjahr = 2002: Zwei-Faktoren-CFA mit je 4 Subskalen. 	
+	sem (PCS -> rp_nbs bp_nbs gh_nbs pf_nbs) (MCS -> vt_nbs sf_nbs re_nbs mh_nbs) if syear == 2002 & valid == 1 & ///
+		(mh_nbs >-8 & sf_nbs >-8  & bp_nbs >-8 & pf_nbs >-8 ), cov(PCS*MCS) standardized 
+			
+	* Faktorscores für alle Jahre vorhersagen
+	predict pcs_cfa mcs_cfa if valid == 1 & (mh_nbs >-8 & sf_nbs >-8  & bp_nbs >-8 & pf_nbs >-8 ) , latent
 		
 	* 2) PCS und MCS Scores z-standardisieren & NBS 
-		egen pcs_cfa_z = std(pcs_cfa)
-		egen mcs_cfa_z = std(mcs_cfa)
-		generate pcs_cfa50 = 50 + 10*pcs_cfa_z
-		generate mcs_cfa50 = 50 + 10*mcs_cfa_z
-		label var pcs_cfa50 "PCS using CFA"
-		label var mcs_cfa50 "MCS using CFA"
-		drop pcs_cfa mcs_cfa mcs_cfa_z pcs_cfa_z 	
-	
+
+		* Mittelwert und SD NUR aus 2002 berechnen
+		summarize pcs_cfa if syear == 2002 & valid == 1 & ///
+			(mh_nbs > -8 & sf_nbs > -8 & bp_nbs > -8 & pf_nbs > -8)
+		scalar mu_pcs = r(mean)
+		scalar sd_pcs = r(sd)
+
+		summarize mcs_cfa if syear == 2002 & valid == 1 & ///
+			(mh_nbs > -8 & sf_nbs > -8 & bp_nbs > -8 & pf_nbs > -8)
+		scalar mu_mcs = r(mean)
+		scalar sd_mcs = r(sd)
+
+		* z-Transformation mit FIXEN Parametern (Basisjahr 2002)
+		gen pcs_cfa_z = (pcs_cfa - mu_pcs) / sd_pcs if !missing(pcs_cfa)
+		gen mcs_cfa_z = (mcs_cfa - mu_mcs) / sd_mcs if !missing(mcs_cfa)
+
+		* Norm-Based Scoring (NBS) relativ zu 2002
+		gen pcs_cfa50 = 50 + 10*pcs_cfa_z
+		gen mcs_cfa50 = 50 + 10*mcs_cfa_z
+
+label var pcs_cfa50 "PCS (CFA, base year 2002 = mean 50, sd 10)"
+label var mcs_cfa50 "MCS (CFA, base year 2002 = mean 50, sd 10)"
+
+drop pcs_cfa mcs_cfa pcs_cfa_z mcs_cfa_z
+
 ** Fragility index 
 	*  See Paper "Health ineqality and health types" by Borella using Health and Retirement Study (HRS)	
-	
 	save $output/health.dta , replace 
 	
 	
