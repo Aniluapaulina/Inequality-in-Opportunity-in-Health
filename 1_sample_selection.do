@@ -14,6 +14,9 @@ use $output/base_withbw.dta , clear
 	keep if netto <= 19 & netto != -3
 	drop netto
 
+* Alter 
+drop if age <=16
+
 * Consider only private households (mit deutschem und ausländischem HV)
 	label list pop
 	tab pop
@@ -60,15 +63,15 @@ use $output/base_withbw.dta , clear
 	tab urban, mi						// 4,353  
 		tab syear  if urban == .		// ... davon 2,831 (65%) in 2022
 
-	drop if missing(siblings, msedu, fsedu, mprofstat, fprofstat, otherparent, singleparent)
+	drop if missing(siblings, msedu, fsedu, mprofstat, fprofstat, otherparent, singleparent, urban)
 	
 	di _N
 	tab syear
 	/*			
-              syear |      Freq.     Percent        Cum.
+			  syear |      Freq.     Percent        Cum.
 		------------+-----------------------------------
 			   2002 |      8,757        6.61        6.61
-			   2004 |      9,321        7.04       13.65
+			   2004 |      9,320        7.04       13.65
 			   2006 |     10,218        7.72       21.37
 			   2008 |      9,599        7.25       28.62
 			   2010 |      9,818        7.41       36.03
@@ -77,9 +80,9 @@ use $output/base_withbw.dta , clear
 			   2016 |     12,923        9.76       66.20
 			   2018 |     15,003       11.33       77.53
 			   2020 |     15,303       11.56       89.09
-			   2022 |     14,449       10.91      100.00
+			   2022 |     14,448       10.91      100.00
 		------------+-----------------------------------
-			  Total |    132,427      100.00
+			  Total |    132,425      100.00
 
 	- loss of obersations in 2022 largely driven by the variables *profstat, *sedu, aber auch otherparent und singleparent
 	- see 2_descriptivestatistics 
@@ -94,6 +97,9 @@ use $output/base_withbw.dta , clear
 	
 	
 	save $output/final.dta, replace
+	
+
+
 	
 	
 	
